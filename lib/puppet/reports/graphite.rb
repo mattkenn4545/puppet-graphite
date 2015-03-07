@@ -26,8 +26,8 @@ Puppet::Reports.register_report(:graphite) do
     prefix = self.host.split(".").reverse.join(".")
     epochtime = Time.now.utc.to_i
     self.metrics.each { |metric,data|
-      data.values.each { |val| 
-        name = "#{prefix}.puppet.#{val[1]}_#{metric}"
+      data.values.each { |val|
+        name = "puppet.#{prefix}.#{val[1]}_#{metric}"
         value = val[2]
 
         send_metric "#{name} #{value} #{epochtime}"
