@@ -15,10 +15,14 @@ Puppet::Reports.register_report(:graphite) do
   Send notification of failed reports to a Graphite server via socket.
   DESC
 
-  def send_metric payload
-    socket = TCPSocket.new(GRAPHITE_SERVER, GRAPHITE_PORT)
-    socket.puts payload
-    socket.close
+  Timeout.timeout(10) do
+    begin
+      def send_metric payload
+        socket = TCPSocket.new(GRAPHITE_SERVER, GRAPHITE_PORT)
+        socket.puts payload
+        socket.close
+      end
+    end
   end
 
   def process
