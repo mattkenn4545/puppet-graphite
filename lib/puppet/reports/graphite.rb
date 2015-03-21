@@ -2,6 +2,7 @@ require 'puppet'
 require 'yaml'
 require 'socket'
 require 'time'
+require 'timeout'
 
 Puppet::Reports.register_report(:graphite) do
 
