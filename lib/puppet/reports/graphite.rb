@@ -17,26 +17,24 @@ Puppet::Reports.register_report(:graphite) do
   DESC
 
   def send_metric payload
-    socket = TCPSocket.new(GRAPHITE_SERVER, GRAPHITE_PORT)
-    socket.puts payload
-    socket.close
+    socket = UDPSocket.new(GRAPHITE_SERVER, GRAPHITE_PORT)
+    socket.send payload
   end
 
   def process
     Puppet.debug "Sending status for #{self.host} to Graphite server at #{GRAPHITE_SERVER}"
     prefix = self.host.split(".").reverse.join(".")
     epochtime = Time.now.utc.to_i
-    Timeout.timeout(10) do
-      begin
-        self.metrics.each { |metric,data|
-          data.values.each { |val|
-            name = "puppet.#{prefix}.#{val[1]}_#{metric}"
-            value = val[2]
 
-            send_metric "#{name} #{value} #{epochtime}"
-          }
+    begin
+      self.metrics.each { |metric,data|
+        data.values.each { |val|
+          name = "puppet.#{prefix}.#{val[1]}_#{metric}"
+          value = val[2]
+          send_metric "#{name} #{value} #{epochtime}"
         }
-      end
+      }
     end
+
   end
 end
