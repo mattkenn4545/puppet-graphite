@@ -17,8 +17,9 @@ Puppet::Reports.register_report(:graphite) do
   DESC
 
   def send_metric payload
-    socket = UDPSocket.new(GRAPHITE_SERVER, GRAPHITE_PORT)
-    socket.send payload
+    socket = UDPSocket.new
+    socket.connect(GRAPHITE_SERVER, GRAPHITE_PORT)
+    socket.send payload, 0
   end
 
   def process
