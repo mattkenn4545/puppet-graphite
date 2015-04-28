@@ -2,7 +2,6 @@ require 'puppet'
 require 'yaml'
 require 'socket'
 require 'time'
-require 'timeout'
 
 Puppet::Reports.register_report(:graphite) do
 
@@ -26,17 +25,13 @@ Puppet::Reports.register_report(:graphite) do
     Puppet.debug "Sending status for #{self.host} to Graphite server at #{GRAPHITE_SERVER}"
     prefix = self.host.split(".").reverse.join(".")
     epochtime = Time.now.utc.to_i
-    Timeout.timeout(10) do
-      begin
-        self.metrics.each { |metric,data|
-          data.values.each { |val|
-            name = "puppet.#{prefix}.#{val[1]}_#{metric}"
-            value = val[2]
+    self.metrics.each { |metric,data|
+      data.values.each { |val|
+        name = "puppet.#{prefix}.#{val[1]}_#{metric}"
+        value = val[2]
 
-            send_metric "#{name} #{value} #{epochtime}"
-          }
-        }
-      end
-    end
+        send_metric "#{name} #{value} #{epochtime}"
+      }
+    }
   end
 end
